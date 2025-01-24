@@ -73,7 +73,10 @@ docker start my_container
 # 10. Remove a container
 docker rm <container_name_or_id>
 # Example:
-docker rm my_container
+docker rm 
+
+# 11. Access to running container
+docker exec -it <container_id_or_name> bash
 ```
 
 ### Docker Compose
