@@ -21,5 +21,4 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls), # Đường dẫn đến trang quản trị admin
     path("todos/", include("todos.urls")), # Đường dẫn đến ứng dụng todos
-
 ]

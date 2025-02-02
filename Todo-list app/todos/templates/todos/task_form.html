@@ -1,0 +1,9 @@
+<h3>Task Form</h3>
+<a href="{% url 'todo_list' %}">Back to Todo List</a>
+
+<form method="POST" action="">
+    {% csrf_token %} <!-- This is a security feature to prevent Cross Site Request Forgery (CSRF) attacks -->
+    {{form.as_p}} <!-- This is the form that we created in the forms.py file --> 
+    <input type="submit" value="Submit">
+    
+</form>
