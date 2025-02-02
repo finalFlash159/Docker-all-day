@@ -1,14 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy # Để redirect sau khi tạo todo
 
 
 from django.contrib.auth.views import LoginView
 
+
 from django.contrib.auth.mixins import LoginRequiredMixin 
+from django.contrib.auth.forms import UserCreationForm # Form tạo người dùng
+from django.contrib.auth import login # Để đăng nhập người dùng
 
 
 from .models import Todo
@@ -22,6 +25,18 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('todo_list')
 
+class RegisterPage(FormView):
+    template_name = 'todos/register.html'
+    form_class = UserCreationForm
+    redirect_authenticated_user = True # Nếu người dùng đã đăng nhập thì sẽ redirect về trang chính
+    success_url = reverse_lazy('todo_list')
+
+    def form_valid(self, form): # Khi form hợp lệ
+        user = form.save() # Lưu người dùng
+        if user is not None:
+            login(self.request, user) # Đăng nhập người dùng
+        return super(RegisterPage, self).form_valid(form) # Gọi phương thức form_valid của class cha
+    
  
 class TodoListView(LoginRequiredMixin, ListView): # LoginRquiredMixin để kiểm tra người dùng đã đăng nhập hay chưa
     model = Todo
@@ -33,6 +48,11 @@ class TodoListView(LoginRequiredMixin, ListView): # LoginRquiredMixin để ki�
         context['todos'] = context['todos'].filter(user=self.request.user) # Lọc công việc theo người dùng
         context['count'] = context['todos'].filter(completed=False).count() # Đếm số công việc chưa hoàn thành
         return context
+    
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('todo_list') # Nếu người dùng đã đăng nhập thì chuyển hướng đến trang danh sách công việc
+        return super(RegisterPage, self).get(*args, **kwargs) # Gọi phương thức get của class cha để hiển thị trang đăng ký
 
 
 
