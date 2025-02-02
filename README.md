@@ -91,9 +91,18 @@ docker compose up --build
 docker compose down
 ```
 
-
-
-
-
-
-
+### Docker Hub
+```bash
+# 1. login to docker hub
+docker login
+# 2. pull image from repo
+docker pull <user-name>/<repo-name>:<tag>
+# 3. Tagging the image before pushing it to the repo
+docker tag <source-image>:<tag> <user-name>/<repo-name>:<tag>
+# 4. Push image to target repo
+docker push <user-name>/<repo-name>:<tag>
+```
+#### Note: 
+```bash
+<user-name> # Docker hub id
+```
