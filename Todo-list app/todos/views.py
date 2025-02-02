@@ -28,6 +28,13 @@ class TodoListView(LoginRequiredMixin, ListView): # LoginRquiredMixin để ki�
     template_name = 'todos/todo_list.html'
     context_object_name = 'todos' # Tên biến sẽ được truyền vào template
 
+    def get_context_data(self, **kwargs): # **kwargs: nhận các tham số truyền vào dưới dạng từ điển
+        context = super().get_context_data(**kwargs) # Lấy context mặc định
+        context['todos'] = context['todos'].filter(user=self.request.user) # Lọc công việc theo người dùng
+        context['count'] = context['todos'].filter(completed=False).count() # Đếm số công việc chưa hoàn thành
+        return context
+
+
 
 class TodoDetailView(LoginRequiredMixin, DetailView):
     model = Todo
@@ -36,13 +43,17 @@ class TodoDetailView(LoginRequiredMixin, DetailView):
 
 class TodoCreate(LoginRequiredMixin, CreateView):
     model = Todo
-    fields = '__all__' # Tạo form từ tất cả các field trong model
+    fields = ['title', 'description', 'completed'] # Các field cần tạo
     success_url = reverse_lazy('todo_list') # Redirect sau khi tạo todo
     template_name = 'todos/task_form.html'
 
+    def form_invalid(self, form):
+        form.instance.user = self.request.user # Gán người dùng hiện tại vào trường user
+        return super(TodoCreate, self).form_valid(form) # Gọi phương thức form_valid của class cha để lưu todo
+
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Todo
-    fields = '__all__' # Các field cần update
+    fields = ['title', 'description', 'completed'] # Các field cần tạo
     template_name = 'todos/task_form.html'
     success_url = reverse_lazy('todo_list') # Redirect sau khi update todo
 
