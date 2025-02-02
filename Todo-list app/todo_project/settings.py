@@ -112,6 +112,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = "login" # Đường dẫn đến trang đăng nhập, 
+# Tại sao phải có cái này? => Để khi người dùng chưa đăng nhập mà truy cập vào trang khác (như create, update, delete, ....) thì sẽ tự động chuyển hướng đến trang đăng nhập
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
