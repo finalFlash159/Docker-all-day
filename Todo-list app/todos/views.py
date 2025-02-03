@@ -37,6 +37,12 @@ class RegisterPage(FormView):
             login(self.request, user) # Đăng nhập người dùng
         return super(RegisterPage, self).form_valid(form) # Gọi phương thức form_valid của class cha
     
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('todo_list') # Nếu người dùng đã đăng nhập thì chuyển hướng đến trang danh sách công việc
+        return super(RegisterPage, self).get(*args, **kwargs) # Gọi phương thức get của class cha để hiển thị trang đăng ký
+
+    
  
 class TodoListView(LoginRequiredMixin, ListView): # LoginRquiredMixin để kiểm tra người dùng đã đăng nhập hay chưa
     model = Todo
@@ -47,13 +53,15 @@ class TodoListView(LoginRequiredMixin, ListView): # LoginRquiredMixin để ki�
         context = super().get_context_data(**kwargs) # Lấy context mặc định
         context['todos'] = context['todos'].filter(user=self.request.user) # Lọc công việc theo người dùng
         context['count'] = context['todos'].filter(completed=False).count() # Đếm số công việc chưa hoàn thành
+
+        search_input = self.request.GET.get('search-area') or ''
+        if search_input:
+            context['todos'] = context['todos'].filter(title__startswith=search_input) # Lọc công việc theo tiêu đề
+                                                    # __startswith: bắt đầu bằng, __icontains: chứa
+        context['search_input'] = search_input
+
         return context
     
-    def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('todo_list') # Nếu người dùng đã đăng nhập thì chuyển hướng đến trang danh sách công việc
-        return super(RegisterPage, self).get(*args, **kwargs) # Gọi phương thức get của class cha để hiển thị trang đăng ký
-
 
 
 class TodoDetailView(LoginRequiredMixin, DetailView):
@@ -67,7 +75,7 @@ class TodoCreate(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('todo_list') # Redirect sau khi tạo todo
     template_name = 'todos/task_form.html'
 
-    def form_invalid(self, form):
+    def form_valid(self, form):
         form.instance.user = self.request.user # Gán người dùng hiện tại vào trường user
         return super(TodoCreate, self).form_valid(form) # Gọi phương thức form_valid của class cha để lưu todo
 
