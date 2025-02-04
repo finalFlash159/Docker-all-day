@@ -14,6 +14,9 @@ from django.contrib.auth.forms import UserCreationForm # Form tạo người dù
 from django.contrib.auth import login # Để đăng nhập người dùng
 
 
+from .forms import CustomUserCreationForm # Thêm form tạo người dùng tuỳ chỉnh (thêm trường your_name)
+
+
 from .models import Todo
 
 
@@ -27,12 +30,14 @@ class CustomLoginView(LoginView):
 
 class RegisterPage(FormView):
     template_name = 'todos/register.html'
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     redirect_authenticated_user = True # Nếu người dùng đã đăng nhập thì sẽ redirect về trang chính
     success_url = reverse_lazy('todo_list')
 
     def form_valid(self, form): # Khi form hợp lệ
-        user = form.save() # Lưu người dùng
+        user = form.save(commit=False)  # Tạo user nhưng chưa lưu vào database
+        user.first_name = form.cleaned_data['your_name']  # Gán your_name vào first_name
+        user.save()  # Lưu user vào database
         if user is not None:
             login(self.request, user) # Đăng nhập người dùng
         return super(RegisterPage, self).form_valid(form) # Gọi phương thức form_valid của class cha

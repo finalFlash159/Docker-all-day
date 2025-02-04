@@ -1,43 +1,87 @@
+{% extends 'todos/main.html' %}
+{% block content %}
 
-{% if request.user.is_authenticated %}
-    <p>{{request.user}}</p>
-    <form action="{% url 'logout' %}" method="POST">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
+<div class="header-bar">
+    <div>
+        <h1> Oh hey, {{ request.user.first_name|title }}! Ready to tackle your tasks? 😉</h1>
+        <h3 style="margin: 0;">
+            {% if count == 0 %}
+                🎉 You have no pending tasks! Enjoy your free time! 🎉
+            {% elif count == 1 %}
+                ⏳ You have 1 task left. Almost done!
+            {% elif count <= 5 %}
+                🔥 Only {{ count }} tasks left! Keep going!
+            {% else %}
+                🚀 You have {{ count }} tasks remaining. Stay focused!
+            {% endif %}
+        </h3>
 
-{% else %}
+        {% if request.user.is_authenticated %}
+        {% comment %} <p>{{request.user}}</p> {% endcomment %}
+        <form class="logout" id="logout-form" method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="link" style="background: none; border: none; color: #fff; cursor: pointer;">
+                Logout
+            </button>
+        </form>
 
-<a href="{% url 'login' %}">Login</a>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
 
-{% endif %}
+        {% endif %}
+                
+    </div>
+</div>
+
+<div id="search-add-wrapper">
+    <form class="search-area" method="GET" >
+        <input type="text" name="search-area" placeholder="Search..." value="{{search_input}}"> 
+        <input class="button" type="submit" value="Search">
+    </form> 
+    <a id="add-link" href="{% url 'task-create' %}">&#x2b;</a>
+</div>
+
+<div class="task-item-wrapper">
+
+    {% for todo in todos %}
+    <div class="task-wrapper">
+        {% if todo.completed %}
+        {% comment %} <input type="checkbox" id="task-{{todo.id}}" checked> {% endcomment %}
+        <div class="task-title">
+            <div class="task-complete-icon"></div>
+            <i><s><a href="{% url 'task-update' todo.id %}">{{todo}}</a></s></i> {# This is the strikethrough effect for completed tasks #} 
+        </div>
+        <a class="delete-link" href="{% url 'task-delete' todo.id %}">&times;</a> {% comment %} This is the 'x' symbol for deleting a task {% endcomment %}
+        {% else %}
+        <div class="task-title">
+            <div class="task-incomplete-icon"></div>
+            <a href="{% url 'task-update' todo.id %}">{{todo}}</a>
+        </div>
+        <a class="delete-link" href="{% url 'task-delete' todo.id %}">&times;</a>
+        {% endif %}
+    </div>
 
 
-<hr>
+    {% empty %}
+    <h3 style="margin: 10px; padding-bottom: 10px;">Your list is empty! Let's add a task 📋</h3>
+    {% endfor %}
+
+</div>
+
+
+
+
+{% comment %} <hr>
 <h1>My Todo List</h1>
-<a href="{% url 'task-create' %}">Add Task</a>
+
 
 <form method="GET">
     <input type="text" name="search-area" placeholder="Search..." value="{{search_input}}"> 
     <input type="submit" value="Search">
-</form>
+</form> {% endcomment %}
 
-<table>
-    <tr>
-        <th>Task</th>
-        <th> </th>
-        <th> </th>
-    </tr>
-    {% for todo in todos %}
-    <tr>
-        <td>{{ todo.title }}</td>
-        {% comment %} <td><a href="{% url 'todo_detail' todo.id %}">View</a></td> {% endcomment %}
-        <td><a href="{% url 'task-update' todo.id %}">Edit</a></td>
-        <td><a href="{% url 'task-delete' todo.id %}">Delete</a></td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="3">No todos found.</td>
-    {% endfor %}
-</table>
+
+{% endblock content %} 
+
+
 

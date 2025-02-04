@@ -1,6 +1,20 @@
-<a href="{% url 'todo_list' %}">Go Back</a>
-<form method="POST">
-    {% csrf_token %}
-    <p>Are you sure you want to delete "{{todo}}"?</p>
-    <input type="submit" value="Delete">
-</form>
+{% extends 'todos/main.html' %}
+{% block content %}
+
+
+<div class="header-bar">
+    <a href="{% url 'todo_list' %}">&#8592; Back</a>
+
+</div>
+
+<div class="card-body">
+
+    <form method="POST">
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{todo}}"?</p>
+        <input class="button" type="submit" value="Delete">
+    </form>
+    
+</div>
+
+{% endblock content %}
