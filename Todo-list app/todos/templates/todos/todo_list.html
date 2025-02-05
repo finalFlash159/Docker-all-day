@@ -3,7 +3,7 @@
 
 <div class="header-bar">
     <div>
-        <h1> Oh hey, {{ request.user.first_name|title }}! Ready to tackle your tasks? 😉</h1>
+        <h1> Oh hey, <span style="color:rgb(244, 184, 74); font-weight: bold;">{{ request.user.first_name|title }}</span>! Ready to tackle your tasks? 😉</h1>
         <h3 style="margin: 0;">
             {% if count == 0 %}
                 🎉 You have no pending tasks! Enjoy your free time! 🎉
